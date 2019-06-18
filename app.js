@@ -36,6 +36,9 @@ app.use(function(req, res, next) {
 });
 
 // register middlewares
+// static route for serving images
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 // parse incoming body data
 app.use(bodyparser.json());
 

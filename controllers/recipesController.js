@@ -11,7 +11,7 @@ exports.getRecipes = (req, res, next) => {
     });
 };
 
-exports.postAddRecipe = (req, res, next) => {
+exports.postRecipe = (req, res, next) => {
   const name = req.body.name;
   const description = req.body.description;
   const ingredients = req.body.ingredients;
@@ -41,7 +41,18 @@ exports.postAddRecipe = (req, res, next) => {
     });
 };
 
-exports.postDeleteRecipe = (req, res, next) => {
+exports.getRecipe = (req, res, next) => {
+  const recipeId=req.params.recipeId;
+  Recipe.findById(recipeId)
+    .then(recipesData => {
+      res.status(200).json(recipesData);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+exports.deleteRecipe = (req, res, next) => {
   const recipeId = req.params.recipeId;
   Recipe.findByIdAndDelete(recipeId)
     .then(recipeData => {
