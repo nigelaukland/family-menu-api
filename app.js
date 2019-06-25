@@ -17,16 +17,18 @@ const recipesRoutes = require('./routes/recipesRoutes');
 // configure file storage for multer
 const multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
+    // this returns the location
     cb(null, 'images/')
   },
   filename: function (req, file, cb) {
+    // this returns the filename (I used datetimestamp)
     cb(null, `${Date.now()}-${file.originalname}`)
   }
 });
 
 // allow CORS
 app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader(
     'Access-Control-Allow-Methods',
     'GET, POST, PUT, PATCH, DELETE'
@@ -43,34 +45,34 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(bodyparser.json());
 
 /// deal with image upload and processing on sepcific routes
-//app.post("/recipe", multer({ storage: multerStorage }).single('imagePath'));
-app.post(["/recipe/add"], multer({ storage: multerStorage }).single('imagePath'), (req, res, next) => { 
+app.post(["/recipe"], multer({ storage: multerStorage }).single('imagePath'), (req, res, next) => { 
   
   // add the filenames to the body
+  req.body.imagePath = path.join(req.file.destination, `${req.file.filename}`);
   req.body.tinyImagePath = path.join(req.file.destination, `tiny_${req.file.filename}`);
   req.body.mediumImagePath = path.join(req.file.destination, `medium_${req.file.filename}`);
   
   const inputImage = sharp(req.file.path);
   // create tiny 80px image
   inputImage
-    .clone()
-    .resize( 80, 80, { fit: 'contain', position: 'left top' })
-    .toFile(path.join(req.file.destination, `tiny_${req.file.filename}`))
-    .then(() => {
-    })
-    .catch((err) => {
-      console.log(err)
-      throw err
-    });
+  .clone()
+  .resize( 80, 80, { fit: 'contain', position: 'left top' })
+  .toFile(path.join(req.file.destination, `tiny_${req.file.filename}`))
+  .then(() => {
+  })
+  .catch((err) => {
+    console.log(err)
+    throw err
+  });
   // create medium 300px image
   inputImage
-    .clone()
-    .resize( 300, 300, { fit: 'contain', position: 'left top' })
-    .toFile(path.join(req.file.destination, `medium_${req.file.filename}`))
-    .then(() => {
-    })
-    .catch((err) => {
-      console.log(err)
+  .clone()
+  .resize( 300, 300, { fit: 'contain', position: 'left top' })
+  .toFile(path.join(req.file.destination, `medium_${req.file.filename}`))
+  .then(() => {
+  })
+  .catch((err) => {
+    console.log(err)
       throw err
     });
   next();
