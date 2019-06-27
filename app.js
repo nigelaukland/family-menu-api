@@ -13,6 +13,8 @@ const app = express();
 
 // load routes
 const recipesRoutes = require('./routes/recipesRoutes');
+const menusRoutes = require('./routes/menusRoutes');
+const dayMenusRoutes = require('./routes/dayMenusRoutes');
 
 // configure file storage for multer
 const multerStorage = multer.diskStorage({
@@ -53,33 +55,37 @@ app.post(["/recipe"], multer({ storage: multerStorage }).single('imagePath'), (r
   req.body.mediumImagePath = path.join(req.file.destination, `medium_${req.file.filename}`);
   
   const inputImage = sharp(req.file.path);
-  // create tiny 80px image
-  inputImage
+
+  // tiny image
+  const tinyPromise = inputImage
   .clone()
-  .resize( 80, 80, { fit: 'contain', position: 'left top' })
+  .resize(80, 80, { fit: 'cover', position: 'centre', background: {r:255,g:255,b:255,alpha:0} })
+  // .resize({ width: 80, position: 'left top', background: {r:255,g:255,b:255,alpha:0} })
   .toFile(path.join(req.file.destination, `tiny_${req.file.filename}`))
-  .then(() => {
-  })
   .catch((err) => {
     console.log(err)
     throw err
   });
-  // create medium 300px image
-  inputImage
+
+  // medium image
+  const mediumPromise = inputImage
   .clone()
-  .resize( 300, 300, { fit: 'contain', position: 'left top' })
+  .resize( 300, 300, { fit: 'cover', position: 'centre', background: {r:255,g:255,b:255,alpha:0} })
   .toFile(path.join(req.file.destination, `medium_${req.file.filename}`))
-  .then(() => {
-  })
   .catch((err) => {
     console.log(err)
       throw err
     });
-  next();
+
+  // Wait until all image processing has been carried out before returning the URLs in the response  
+  Promise.all([ tinyPromise, mediumPromise ], next());
+
 });
 
 // register routes
 app.use(recipesRoutes);
+app.use(menusRoutes);
+app.use(dayMenusRoutes);
 
 // establish database connection
 mongoose
