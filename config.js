@@ -9,7 +9,10 @@ const config = {
         // Set location of keys
         key: '/bin/key.pem',
         cert: '/bin/cert.pem'
-    }  
+    },  
+    auth: {
+      tokenKey: 'SuperSecretKey'
+    }
 };
 
 module.exports = config;

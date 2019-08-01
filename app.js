@@ -15,6 +15,7 @@ const app = express();
 const recipesRoutes = require('./routes/recipesRoutes');
 const menusRoutes = require('./routes/menusRoutes');
 const dayMenusRoutes = require('./routes/dayMenusRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // configure file storage for multer
 const multerStorage = multer.diskStorage({
@@ -35,7 +36,7 @@ app.use(function(req, res, next) {
     'Access-Control-Allow-Methods',
     'GET, POST, PUT, PATCH, DELETE'
   );
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorisation');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
@@ -86,6 +87,7 @@ app.post(["/recipe"], multer({ storage: multerStorage }).single('imagePath'), (r
 app.use(recipesRoutes);
 app.use(menusRoutes);
 app.use(dayMenusRoutes);
+app.use(authRoutes);
 
 // establish database connection
 mongoose
