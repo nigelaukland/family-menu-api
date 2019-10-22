@@ -63,6 +63,7 @@ exports.deleteRecipe = (req, res, next) => {
       });
     })
     .catch(err => {
+      // TODO: return error status 
       console.log(err);
     });
 };

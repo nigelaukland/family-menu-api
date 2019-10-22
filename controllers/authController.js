@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const AUTHKEY = require('./../config').auth.tokenKey;
+const EXPIRESIN = require('./../config').auth.exipresIn;
 
 ///////////////// end setup of email
 
@@ -13,32 +14,34 @@ exports.postLogin = (req, res, next) => {
   let targetUser;
   // find the user in the user collection
   User.findOne({ email: email })
-    .then(userDoc => {
+    .then((userDoc) => {
       // user found
       if (userDoc) {
         // check password
-        console.log(`User ${userDoc.email} found`)
+        console.log(`User ${userDoc.email} found`);
         targetUser = userDoc;
         return bcrypt.compare(password, userDoc.password);
-      }
-      else {
+      } else {
         // password does not match or user not found
-        console.log('User not found')
-      //   res.status(401).json({ message: 'User not authenticated' });
+        console.log('User not found');
+        //   res.status(401).json({ message: 'User not authenticated' });
         return next();
       }
     })
-    .then(result => {
+    .then((result) => {
       if (result === true) {
         // password matches - authenticate the user and provide them a token
         const token = jwt.sign(
           { email: targetUser.email, userId: targetUser._id.toString() },
-          AUTHKEY, { expiresIn: '1h' }
+          AUTHKEY,
+          { expiresIn: EXPIRESIN }
         );
         res.status(200).json({
           message: 'User authenticated',
           token: token,
-          userId: targetUser._id.toString()
+          userId: targetUser._id.toString(
+          ),
+          expiresIn: EXPIRESIN
         });
 
         next();
@@ -48,7 +51,7 @@ exports.postLogin = (req, res, next) => {
         res.status(401).json({ message: 'User not authenticated' });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       // if it doesn't have a status code, give it a default!
       if (!err.statusCode) {
         err.statusCode = 500;
@@ -61,7 +64,7 @@ exports.postSignUp = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   User.findOne({ email: email })
-    .then(userDoc => {
+    .then((userDoc) => {
       if (userDoc) {
         res
           .status(200)
@@ -75,17 +78,23 @@ exports.postSignUp = (req, res, next) => {
       console.log(newUser);
       return newUser
         .save()
-        .then(result => {
+        .then((result) => {
           console.log(`Created user ${newUser.email}`);
           const token = jwt.sign(
             { email: newUser.email, userId: result._id.toString() },
-            AUTHKEY, { expiresIn: '3600' }
+            AUTHKEY,
+            { expiresIn: EXPIRESIN }
           );
           res
             .status(200)
-            .json({ message: 'User created!', token: token, userId: result._id });
+            .json({
+              message: 'User created!',
+              token: token,
+              userId: result._id,
+              expiresIn: EXPIRESIN
+            });
         })
-        .catch(err => {
+        .catch((err) => {
           // if it doesn't have a status code, give it a default!
           if (!err.statusCode) {
             err.statusCode = 500;
@@ -93,7 +102,7 @@ exports.postSignUp = (req, res, next) => {
           next(err);
         });
     })
-    .catch(err => {
+    .catch((err) => {
       // if it doesn't have a status code, give it a default!
       if (!err.statusCode) {
         err.statusCode = 500;

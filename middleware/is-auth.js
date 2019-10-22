@@ -11,6 +11,7 @@ isAuth = (req, res, next) => {
     // expecting an Authorization header of BEARER 
     const token = req.get('Authorization').split(' ')[1];
     decodedToken = jwt.verify(token, AUTHKEY);
+    // TODO: catch an expired token
     console.log(`decodedToken ${decodedToken}`);
   } catch (err) { 
     res.status(401).json({ message: 'User not authorised' });

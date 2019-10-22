@@ -10,7 +10,7 @@ exports.postDayMenu = (req, res, next) => {
   const dinnerRecipeId = (req.body.dinnerRecipeId == '') ? undefined : mongoose.Types.ObjectId(req.body.dinnerRecipeId);
   const dinnerText = req.body.dinnerText;
   const dayMenu = new DayMenu({
-    startDate: startDate, 
+    startDate: startDate,
     morningRecipeId: morningRecipeId, 
     morningText: morningText, 
     lunchRecipeId: lunchRecipeId, 

@@ -11,7 +11,8 @@ const config = {
         cert: '/bin/cert.pem'
     },  
     auth: {
-      tokenKey: 'SuperSecretKey'
+      tokenKey: 'SuperSecretKey',
+      exipresIn: 86400 // 24h in seconds
     }
 };
 
